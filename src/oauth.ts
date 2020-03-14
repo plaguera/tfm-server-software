@@ -26,12 +26,10 @@ export class OAuth {
     async access_token(code: string) {
         this.code = code;
         let res = await this.fetch('POST', this.getParamURL());
-        let a: string = res as string;
-        let json = JSON.parse(res);
-        this.accessToken.value = json['access_token'];
-        this.accessToken.type = json['token_type'];
-        this.accessToken.scope = json['scope'];
-
+        console.log(res);
+        this.accessToken.value = res['access_token'];
+        this.accessToken.type = res['token_type'];
+        this.accessToken.scope = res['scope'];
         return res;
     }
 
@@ -42,10 +40,7 @@ export class OAuth {
                 Accept: 'application/json' 
             }
         };
-        const res = await fetch(url, init).catch((error: any) => console.error(error));
-        if (res instanceof Response)
-            return await res.text();
-        throw "ERROR";
+        return await fetch(url, init).then(res => res.text()).then(body => JSON.parse(body)).catch((error) => console.error(error));
     }
 
 }

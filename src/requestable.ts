@@ -18,10 +18,7 @@ export abstract class Requestable {
             body: JSON.stringify(data)
         };
         console.log(init);
-        const res = await fetch(this.endpoint + path, init).catch((error) => console.error(error));
-        if (res instanceof Response)
-            return await res.json();
-        throw "ERROR"
+        return await fetch(this.endpoint + path, init).then(res => res.json()).catch((error) => console.error(error));
     }
     
 }
