@@ -1,5 +1,4 @@
 import { Server } from './server'
-import { Auth } from './auth';
 import { OAuth } from './oauth';
 
 require('dotenv').config();
