@@ -6,7 +6,7 @@
     "author": "Pedro Lagüera <laguerapedro@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "start": "ts-node dist/index.ts",
+        "start": "concurrently --kill-others \"tsc\" \"node dist/index.js\"",
         "compile": "tsc -w",
         "dev": "nodemon ./dist/index.js"
     },
