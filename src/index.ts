@@ -2,7 +2,6 @@ import { Server } from './server'
 import { OAuth } from './oauth';
 
 require('dotenv').config();
-Auth.validate();
 
 let port = process.env.PORT || '3040';
 let server = new Server();

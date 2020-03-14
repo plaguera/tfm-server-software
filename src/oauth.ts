@@ -26,7 +26,7 @@ export class OAuth {
     async access_token(code: string) {
         this.code = code;
         let res = await this.fetch('POST', this.getParamURL());
-
+        let a: string = res as string;
         let json = JSON.parse(res);
         this.accessToken.value = json['access_token'];
         this.accessToken.type = json['token_type'];
@@ -35,7 +35,7 @@ export class OAuth {
         return res;
     }
 
-    async fetch(method: string, url: string): Promise<object> {
+    async fetch(method: string, url: string): Promise<string> {
         let init = {
             method: method,
             headers: {
@@ -43,7 +43,9 @@ export class OAuth {
             }
         };
         const res = await fetch(url, init).catch((error: any) => console.error(error));
-        return await res.text();
+        if (res instanceof Response)
+            return await res.text();
+        throw "ERROR";
     }
 
 }
