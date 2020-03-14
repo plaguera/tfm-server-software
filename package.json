@@ -6,9 +6,9 @@
     "author": "Pedro Lagüera <laguerapedro@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "dev": "concurrently --kill-others \"tsc -w -p .\" \"nodemon dist/index.js\"",
+        "start": "ts-node dist/index.ts",
         "compile": "tsc -w",
-        "start": "nodemon ./dist/index.js"
+        "dev": "nodemon ./dist/index.js"
     },
     "devDependencies": {
         "@types/cors": "^2.8.6",
