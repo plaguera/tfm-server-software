@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import { strict } from 'assert';
+import http = require('http');
 
 interface AccessToken {
     value: string;
@@ -11,16 +13,27 @@ export class OAuth {
     accessToken: AccessToken = { value: '', type: '', scope: '' };
     accessTokenURL: string = 'https://github.com/login/oauth/access_token';
     code: string = '';
+    redirectURI: string = '';
 
     getParamURL(): string {
         return  this.accessTokenURL
                 + `?client_id=${process.env.CLIENT_ID}`
                 + `&client_secret=${process.env.CLIENT_SECRET}`
-                + `&code=${this.code}`; 
+                + `&code=${this.code}`
+                //+ `&redirect_uri=${this.redirectURI}`; 
     }
 
     authorized(): boolean {
-        return this.accessToken !== undefined;
+        return this.accessToken.value != '';
+    }
+
+    authorize(referer?: string) {
+        if (referer)
+            this.redirectURI = referer;
+        console.log('HOLA = ' + this.redirectURI)
+        return 'https://github.com/login/oauth/authorize'
+                + `?client_id=${process.env.CLIENT_ID}`;
+                //+ `?redirect_uri=${this.redirectURI}`;
     }
 
     async access_token(code: string) {

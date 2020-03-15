@@ -30,6 +30,8 @@ export class Server {
             preflightContinue: false
         };
         this.socket.use(cors(options));
+        this.socket.use("/public", express.static(__dirname + '/../dist/public'));
+        //this.socket.use("/style.css", express.static(__dirname + '/../dist/public/stylesheets/style.css'));
     }
 
     dataBaseConnection() {
@@ -46,15 +48,11 @@ export class Server {
             extended: false
         }));
         this.socket.use(session({
-            store: new FileStore({
-                path: './session-store'
-            }),
-            secret: 'keyboard cat',
-            name: '_github_api_',
-            resave: false,
-            saveUninitialized: false,
+            secret: 'secret',
+            resave: true,
+            saveUninitialized: true,
             cookie: {
-                maxAge: 60 * 60 * 24
+                maxAge: 60*60*24
             }
         }));
     }
@@ -72,7 +70,9 @@ export class Server {
         this.socket.route("/api/repos/:user/:repo/issues/:issuenumber/comments").get(Controller.comments);
         this.socket.route("/api/repos/:user/:repo/issues/:issuenumber/comments").post(Controller.comment);
         this.socket.route("/api/repos/:user/:repo/issues/comments/:comment_id").get(Controller.comment);
-        this.socket.route("/oauth/redirect").get(Controller.authorize);
+        this.socket.route("/authorize").get(Controller.authorize);
+        this.socket.route("/authorized").get(Controller.authorized);
+        this.socket.route("/oauth/redirect").get(Controller.access_token);
     }
 
-}
+}//plaguera-github-comments.herokuapp.com

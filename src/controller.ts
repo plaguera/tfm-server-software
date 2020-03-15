@@ -52,7 +52,7 @@ export class Controller {
         }
     }
 
-    static comments(req: Request, res: Response) {    
+    static comments(req: Request, res: Response) {
         let repo = new Repository(req.params.user, req.params.repo);
         let issuenumber = Number.parseInt(req.params.issuenumber);
         if (req.method == 'GET') {
@@ -65,7 +65,7 @@ export class Controller {
         }
     }
 
-    static comment(req: Request, res: Response) {    
+    static comment(req: Request, res: Response) {
         let repo = new Repository(req.params.user, req.params.repo);
         if (req.method == 'GET') {
             let comment_id = Number.parseInt(req.params.comment_id);
@@ -86,15 +86,32 @@ export class Controller {
         }
     }
 
-    static async authorize(req: Request, res: Response) { 
+    static async authorize(req: Request, res: Response) {
+        res.redirect(Controller.oauth.authorize(req.headers.referer));
+        /*console.log(req.query);
         Controller.oauth.access_token(req.query.code).then((result: any) => {
-            res.redirect('http://localhost:1234');
+            //res.redirect('http://localhost:1234');
             //sendReponse(res, httpStatus.OK, result);
         }).catch((error: any) => {
             //sendReponse(res, httpStatus.NOT_FOUND, null);
             console.error(error);
         });
-        
+        */
+    }
+
+    static async authorized(req: Request, res: Response) {
+        console.log(req.session !== undefined && req.session.access_token !== undefined)
+        res.json({ logged_in: req.session !== undefined && req.session.access_token !== undefined });
+    }
+
+    static async access_token(req: Request, res: Response) {
+        Controller.oauth.access_token(req.query.code).then(re => {
+            req.session!.access_token = re['access_token'];
+            req.session!.logged_in = true;
+            console.log('A = ' + Controller.oauth.redirectURI);
+            console.log('B = ' + JSON.stringify(req.session));
+            req.session?.regenerate(() => res.redirect(Controller.oauth.redirectURI));
+        }).catch((error) => console.error(error));
     }
 
 }

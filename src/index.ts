@@ -1,5 +1,4 @@
 import { Server } from './server'
-import { OAuth } from './oauth';
 
 require('dotenv').config();
 
@@ -8,5 +7,3 @@ let server = new Server();
 server.socket.listen(port, function () {
     console.log(`Listening on port ${port}`);
 });
-
-process.on('SIGINT', () => { console.log("Bye bye!"); process.exit(); })
