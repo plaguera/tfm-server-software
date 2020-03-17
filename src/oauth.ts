@@ -1,16 +1,15 @@
 import fetch from 'node-fetch';
-import { strict } from 'assert';
-import http = require('http');
+import querystring from 'query-string';
 
 interface AccessToken {
-    value: string;
-    type: string;
+    access_token: string;
+    token_type: string;
     scope: string;
 } 
 
 export class OAuth {
 
-    accessToken: AccessToken = { value: '', type: '', scope: '' };
+    accessToken: string = '';
     accessTokenURL: string = 'https://github.com/login/oauth/access_token';
     code: string = '';
     redirectURI: string = '';
@@ -23,27 +22,21 @@ export class OAuth {
                 //+ `&redirect_uri=${this.redirectURI}`; 
     }
 
-    authorized(): boolean {
-        return this.accessToken.value != '';
-    }
-
     authorize(referer?: string) {
         if (referer)
             this.redirectURI = referer;
-        console.log('HOLA = ' + this.redirectURI)
         return 'https://github.com/login/oauth/authorize'
                 + `?client_id=${process.env.CLIENT_ID}`;
                 //+ `?redirect_uri=${this.redirectURI}`;
     }
 
+    authorized() {
+        return this.accessToken !== '';
+    }
+
     async access_token(code: string) {
         this.code = code;
-        let res = await this.fetch('POST', this.getParamURL());
-        console.log(res);
-        this.accessToken.value = res['access_token'];
-        this.accessToken.type = res['token_type'];
-        this.accessToken.scope = res['scope'];
-        return res;
+        return await this.fetch('POST', this.getParamURL());
     }
 
     async fetch(method: string, url: string): Promise<string> {

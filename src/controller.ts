@@ -1,8 +1,12 @@
 import httpStatus from 'http-status';
+//import querystring from 'querystring';
+const querystring = require('querystring');
 import { OAuth } from './oauth';
 import { Repository } from './repository'
 import { Request, Response } from 'express';
 import { User } from './user'
+import { Markdown } from './markdown';
+import { strict } from 'assert';
 
 const sendReponse = function (res: Response<any>, statusCode: number, data: object | null) {
     res.status(statusCode).json(data);
@@ -12,6 +16,12 @@ export class Controller {
 
     static oauth: OAuth = new OAuth;
 
+    static authorization(req: Request, res: Response, next){
+        Controller.oauth.accessToken = req.headers['authorization']?.substring(5) || '';
+        console.log(Controller.oauth.accessToken);
+        next();
+    }
+    
     static user(req: Request, res: Response) {
         let user = new User(req.params.id || '');
         user.get().then(result => {
@@ -32,11 +42,21 @@ export class Controller {
         });
     }
 
+    static issue(req: Request, res: Response) {
+        let repo = new Repository(req.params.user, req.params.repo);
+        repo.issue(Number.parseInt(req.params.issue_number)).then(result => {
+            sendReponse(res, httpStatus.OK, result);
+        }).catch((error) => {
+            sendReponse(res, httpStatus.NOT_FOUND, null);
+            console.error(error);
+        });
+    }
+
     static issues(req: Request, res: Response) {
         let repo = new Repository(req.params.user, req.params.repo);
-        if (req.method == 'GET') {
+        if (req.method == 'GET') { 
             repo.issues().then(result => {
-                (result as Array<Object>).sort((a, b) => { return a['number'] - b['number']; });
+                //(result as Array<Object>).sort((a, b) => { return a['number'] - b['number']; });
                 sendReponse(res, httpStatus.OK, result);
             }).catch((error) => {
                 sendReponse(res, httpStatus.NOT_FOUND, null);
@@ -105,13 +125,13 @@ export class Controller {
     }
 
     static async access_token(req: Request, res: Response) {
-        Controller.oauth.access_token(req.query.code).then(re => {
-            req.session!.access_token = re['access_token'];
-            req.session!.logged_in = true;
-            console.log('A = ' + Controller.oauth.redirectURI);
-            console.log('B = ' + JSON.stringify(req.session));
-            req.session?.regenerate(() => res.redirect(Controller.oauth.redirectURI));
+        Controller.oauth.access_token(req.query.code).then(result => {
+            res.redirect(Controller.oauth.redirectURI + '?' + querystring.stringify(result));
         }).catch((error) => console.error(error));
+    }
+
+    static async markdown(req: Request, res: Response) {
+        Markdown.render(req.body).then(result => console.log(result));
     }
 
 }

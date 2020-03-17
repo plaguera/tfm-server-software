@@ -17,10 +17,10 @@ export abstract class Requestable {
             }
         };
         if (Controller.oauth.authorized())
-            init.headers['Authorization'] = 'token ' + Controller.oauth.accessToken?.value;
+            init.headers['Authorization'] = 'token ' + Controller.oauth.accessToken;
         if (data)
             init.headers['body'] = JSON.stringify(data);
-        console.log(init);
+        //console.log(init);
         return await fetch(this.endpoint + path, init).then(res => res.json()).catch((error) => console.error(error));
     }
 

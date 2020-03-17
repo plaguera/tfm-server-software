@@ -27,6 +27,7 @@
         "express-session": "^1.17.0",
         "http-status": "^1.4.2",
         "node-fetch": "^2.6.0",
+        "query-string": "^6.11.1",
         "session-file-store": "^1.4.0",
         "typescript": "^3.8.2"
     }

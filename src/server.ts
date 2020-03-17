@@ -1,7 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-let session = require('express-session');
-let FileStore = require('session-file-store')(session);
 import { Controller } from './controller';
 
 export class Server {
@@ -22,7 +20,8 @@ export class Server {
                 "X-Requested-With",
                 "Content-Type",
                 "Accept",
-                "X-Access-Token"
+                "X-Access-Token",
+                "Authorization"
             ],
             credentials: true,
             methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
@@ -31,15 +30,6 @@ export class Server {
         };
         this.socket.use(cors(options));
         this.socket.use("/public", express.static(__dirname + '/../dist/public'));
-        //this.socket.use("/style.css", express.static(__dirname + '/../dist/public/stylesheets/style.css'));
-    }
-
-    dataBaseConnection() {
-        //this.database.createConnection();
-    }
-
-    closedataBaseConnection(message: string, callback: any) {
-        //this.database.closeConnection(message, () => callback());
     }
 
     middleware() {
@@ -47,32 +37,28 @@ export class Server {
         this.socket.use(express.urlencoded({
             extended: false
         }));
-        this.socket.use(session({
-            secret: 'secret',
-            resave: true,
-            saveUninitialized: true,
-            cookie: {
-                maxAge: 60*60*24
-            }
-        }));
     }
 
     routes() {
         this.socket.route("/").get((req, res) => {
-            res.send({ result: "version 0.0.2" });
+            res.send({ result: 'version 1.0.0' });
         });
+
+        this.socket.get('*', Controller.authorization);
 
         this.socket.route("/api/user").get(Controller.user);
         this.socket.route("/api/users/:id").get(Controller.user);
         this.socket.route("/api/repos/:user/:repo").get(Controller.repo);
         this.socket.route("/api/repos/:user/:repo/issues").get(Controller.issues);
         this.socket.route("/api/repos/:user/:repo/issues").post(Controller.issues);
+        this.socket.route("/api/repos/:user/:repo/issues/:issue_number").get(Controller.issue);
         this.socket.route("/api/repos/:user/:repo/issues/:issuenumber/comments").get(Controller.comments);
         this.socket.route("/api/repos/:user/:repo/issues/:issuenumber/comments").post(Controller.comment);
         this.socket.route("/api/repos/:user/:repo/issues/comments/:comment_id").get(Controller.comment);
         this.socket.route("/authorize").get(Controller.authorize);
         this.socket.route("/authorized").get(Controller.authorized);
         this.socket.route("/oauth/redirect").get(Controller.access_token);
+        this.socket.route("/api/markdown").post(Controller.markdown);
     }
 
-}//plaguera-github-comments.herokuapp.com
+}
