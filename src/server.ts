@@ -31,7 +31,7 @@ export class Server {
             preflightContinue: false
         };
         this.socket.use(cors(options));
-        this.socket.use("/public", express.static(__dirname + '/public'));
+        this.socket.use('/public', express.static(path.join(__dirname, 'public')))
     }
 
     middleware() {
@@ -43,7 +43,8 @@ export class Server {
 
     routes() {
         this.socket.route("/").get((req, res) => {
-            res.sendFile(path.join('/html/client.html'));
+            res.sendFile(__dirname + '/public/html/client.html');
+
         });
 
         this.socket.get('*', Controller.authorization);
