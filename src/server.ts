@@ -43,7 +43,7 @@ export class Server {
 
     routes() {
         this.socket.route("/").get((req, res) => {
-            res.sendFile(path.join(__dirname + '/public/html/client.html'));
+            res.sendFile(path.join('/html/client.html'));
         });
 
         this.socket.get('*', Controller.authorization);
